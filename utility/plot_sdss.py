@@ -9,11 +9,57 @@
 #####################
 
 from matplotlib import pyplot as plt
+import numpy as np
 from fetch_sdss import *
 
 #############
 # MAIN CODE #
 #############
+
+# We can use this to fetch the one hot and optionally 
+# a colormapping associated with that one hot.
+def get_one_hot(patch_of_sky):
+
+    '''
+        patch_of_sky -> the dataframe from SDSS that contains classes.
+    '''
+
+    # Get all of the classes and their unique occurrences.
+    classes = patch_of_sky['class']
+    unq_classes = pds.unique(classes)
+
+    # Define a numpy array to store the Boolean values.
+    one_hot = np.zeros((classes.shape[0], unq_classes.shape[0]), dtype = int)
+
+    for idx, elem in enumerate(unq_classes):
+        loc = elem == classes
+        one_hot[:, idx] = loc
+
+    return one_hot
+
+def get_color_map(one_hot, obj_colors):
+    obj_cmap = []
+
+    if (type(obj_colors) != str) and (len(obj_colors) != len(unq_classes)):
+        print('The size of the input colors does not match the size of the number of unique classes.\n')
+        print('Returning just the one hot.')
+        return one_hot
+
+    else:
+        for idx, _ in enumerate(classes):
+
+            obj_cmap.append('')
+            for jdx, _ in enumerate(unq_classes):
+                if type(obj_colors) == str:
+                    color = obj_colors
+                else:
+                    color = obj_colors[jdx]
+                obj_cmap[idx] += one_hot[idx, jdx]*color
+
+    
+
+
+
 
 def plot_celestial_coordinates(patch_of_sky, obj_size = 100, obj_alpha = 1, obj_cmap = None):
 
@@ -42,3 +88,10 @@ def plot_celestial_coordinates(patch_of_sky, obj_size = 100, obj_alpha = 1, obj_
     ax.set_title('celestial coordinates of the patch', fontsize = 14)
 
     return fig, ax
+ra = (0, .1)
+dec = ra
+print('red'*0)
+df = get_sky_patch(ra, dec)
+
+get_one_hot(df, ['red', 'blue', 'green'])
+
