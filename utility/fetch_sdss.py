@@ -40,7 +40,7 @@ def get_sky_patch(ra, dec, obj_class = None):
     # Defining the query based on whether a class has been selected or not.
     if obj_class is not None: 
         query = f'''SELECT
-                        p.objid, p.ra, p.dec, p.u, p.g, p.r, p.i, p.z, p.cx, p.cy, p.cz,
+                        p.objid, p.ra, p.dec, p.u, p.g, p.r, p.i, p.z, p.cx, p.cy, p.cz, 
                         s.class, s.z as redshift
                     FROM PhotoObj AS p
                     JOIN SpecObj AS s ON s.bestobjid = p.objid

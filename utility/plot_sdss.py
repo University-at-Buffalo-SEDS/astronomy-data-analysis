@@ -29,7 +29,7 @@ def get_one_hot(patch_of_sky):
     unq_classes = pds.unique(classes)
 
     # Define a numpy array to store the Boolean values.
-    one_hot = np.zeros((classes.shape[0], unq_classes.shape[0]), dtype = int)
+    one_hot = np.zeros((classes.shape[0], unq_classes.shape[0]), dtype = bool)
 
     # Iterating over to assign the binary values to the one-hot.
     for idx, elem in enumerate(unq_classes):
@@ -84,26 +84,43 @@ def get_color_map(one_hot, obj_colors):
     return obj_cmap
 
 # We can use this to plot right ascension and declination.
-def plot_celestial_coordinates(patch_of_sky, obj_size = 100, obj_alpha = 1, obj_cmap = None):
+def plot_celestial_coordinates(patch_of_sky, labels, obj_size = 100, obj_alpha = 1, one_hot = None, obj_cmap = None):
 
     '''
         patch_of_sky -> the dataframe from SDSS that contains coordinates.
+        labels -> the identifiers of the objects.
         obj_size -> the size of the objects for the plot.
         obj_alpha -> the transparency of the objects.
+        one_hot -> the one-hot encoding of the objects.
         obj_cmap -> the colors and sizes for the object.
     '''
 
     fig, ax = plt.subplots(1, 1)
 
     # Get the celestial coordinates.
-    ra = patch_of_sky['ra']
-    dec = patch_of_sky['dec']
+    ra = np.array(patch_of_sky['ra'])
+    dec = np.array(patch_of_sky['dec'])
+    print(ra)
 
     # Checking to see if the object's colormapping is defined.
     if obj_cmap is None:
         ax.scatter(ra, dec, alpha = obj_alpha, s = obj_size, c = 'gold')
+
     else:
-        ax.scatter(ra, dec, alpha = obj_alpha, s = obj_size, c = obj_cmap)
+        # If we have the one-hot, then we can use it to label the objects.
+        if one_hot is not None:
+            for idx in range(one_hot.shape[1]):
+                locs = one_hot[:, idx]
+                
+                ax.scatter(ra[locs], dec[locs], 
+                           alpha = obj_alpha, s = obj_size, c = obj_cmap[locs], label = labels[idx])
+
+                ax.legend(loc = 'upper right', bbox_to_anchor = [1.1, 1], frameon = False, fontsize = 12)
+
+        # Otherwise, just plot it without labels or distinction.
+        else:
+            ax.scatter(ra, dec, alpha = obj_alpha, s = obj_size, c = obj_cmap)
+
 
     # Labeling the axes and giving it a title.
     ax.set_ylabel('declination, degrees', fontsize = 12)
