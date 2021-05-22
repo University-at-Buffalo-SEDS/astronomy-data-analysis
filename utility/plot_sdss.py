@@ -9,7 +9,6 @@
 
 from matplotlib import pyplot as plt
 import numpy as np
-from fetch_sdss import *
 
 #############
 # MAIN CODE #
