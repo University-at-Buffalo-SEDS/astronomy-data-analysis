@@ -1,7 +1,6 @@
 #######################################
-# The purpose of this .py is to fetch #
-# the data from SDSS's SQL database   #
-# for any given RA, DEC, and CLASS.   #
+# The purpose of this .py is to plot  #
+# the data from SDSS's SQL database.  #
 #######################################
 
 #####################
@@ -120,7 +119,7 @@ def plot_celestial_coordinates(patch_of_sky, labels, obj_size = 100, obj_alpha =
                 ax.scatter(ra[locs], dec[locs], 
                            alpha = obj_alpha, s = obj_size, c = obj_cmap[locs], label = labels[idx])
 
-                ax.legend(loc = 'upper right', bbox_to_anchor = [1.35, 1], frameon = False, fontsize = 12)
+            ax.legend(loc = 'upper right', bbox_to_anchor = [1.35, 1], frameon = False, fontsize = 12)
 
         # Otherwise, just plot it without labels or distinction.
         else:
@@ -131,5 +130,48 @@ def plot_celestial_coordinates(patch_of_sky, labels, obj_size = 100, obj_alpha =
     ax.set_ylabel('declination, degrees', fontsize = 12)
     ax.set_xlabel('right ascension, degrees', fontsize = 12)
     ax.set_title('celestial coordinates of the patch', fontsize = 14)
+
+    return fig, ax
+
+
+def plot_red_shift(patch_of_sky, labels, one_hot = None, obj_cmap = None):
+
+    '''
+        patch_of_sky -> the dataframe from SDSS that contains coordinates.
+        labels -> the identifiers of the objects.
+        one_hot -> the one-hot encoding of the objects.
+        obj_cmap -> the colors and sizes for the object.
+    '''
+
+    # Get the red shift.
+    redshift = patch_of_sky['redshift']
+
+    # Create the figure object.
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    # Checking to see if the object's colormapping is defined.
+    if obj_cmap is None:
+        ax.hist(redshift, bins = int(np.sqrt(redshift.shape[0])), color = 'red')
+
+    else:
+        # If we have the one-hot, then we can use it to label the objects.
+        if one_hot is not None:
+            for idx in range(one_hot.shape[1]):
+                locs = one_hot[:, idx]
+                
+                ax.hist(redshift[locs], bins = int(np.sqrt(redshift.shape[0])), 
+                        color = obj_cmap[locs][0], label = labels[idx])
+
+            ax.legend(loc = 'upper right', frameon = False, fontsize = 12)
+
+        else:
+            print('We need the one-hot in order to proceed.')
+
+
+    # Labeling the axes and giving it a title.
+    ax.set_ylabel('counts', fontsize = 12)
+    ax.set_xlabel('red shift relative to the sun', fontsize = 12)
+    ax.set_title('red shift of the patch', fontsize = 14)
 
     return fig, ax
