@@ -1,7 +1,22 @@
+#######################################
+# The purpose of this .py is to fetch #
+# the data from SDSS's SQL database   #
+# for any given RA, DEC, and CLASS.   #
+#######################################
+
+#####################
+# IMPORT STATEMENTS #
+#####################
+
 import pandas as pds
 import requests 
 from io import StringIO
 
+#############
+# MAIN CODE #
+#############
+
+# We use this function to get a patch of the sky from the SDSS 14 dataserver.
 def get_sky_patch(ra, dec, obj_class = None): 
     
     '''
