@@ -79,7 +79,7 @@ def get_color_map(one_hot, obj_colors):
                 
                 # If one_hot[idx, jdx] is 0, then it appends an empty string.
                 # Otherwise, if it's 1, then it appends the color once.
-                obj_cmap[idx] += one_hot[idx, jdx]*color
+                obj_cmap[idx] += int(one_hot[idx, jdx])*color
 
     return obj_cmap
 
@@ -95,12 +95,17 @@ def plot_celestial_coordinates(patch_of_sky, labels, obj_size = 100, obj_alpha =
         obj_cmap -> the colors and sizes for the object.
     '''
 
-    fig, ax = plt.subplots(1, 1)
-
     # Get the celestial coordinates.
     ra = np.array(patch_of_sky['ra'])
     dec = np.array(patch_of_sky['dec'])
-    print(ra)
+    
+    # Adjust the aspect to more reflect the patch of sky.
+    dec0 = dec.min()
+    dec1 = dec.max()
+    
+    # Create the figure object.
+    fig = plt.figure()
+    ax = fig.add_subplot(111, aspect = 1/np.cos((dec0 + dec1)/2*np.pi/180))
 
     # Checking to see if the object's colormapping is defined.
     if obj_cmap is None:
@@ -115,7 +120,7 @@ def plot_celestial_coordinates(patch_of_sky, labels, obj_size = 100, obj_alpha =
                 ax.scatter(ra[locs], dec[locs], 
                            alpha = obj_alpha, s = obj_size, c = obj_cmap[locs], label = labels[idx])
 
-                ax.legend(loc = 'upper right', bbox_to_anchor = [1.1, 1], frameon = False, fontsize = 12)
+                ax.legend(loc = 'upper right', bbox_to_anchor = [1.35, 1], frameon = False, fontsize = 12)
 
         # Otherwise, just plot it without labels or distinction.
         else:
@@ -128,5 +133,3 @@ def plot_celestial_coordinates(patch_of_sky, labels, obj_size = 100, obj_alpha =
     ax.set_title('celestial coordinates of the patch', fontsize = 14)
 
     return fig, ax
-
-
